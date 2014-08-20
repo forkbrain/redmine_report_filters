@@ -1,0 +1,52 @@
+<% if @statuses.empty? or rows.empty? %>
+    <p><i><%=l(:label_no_data)%></i></p>
+<% else %>
+    <table class="list issue-report">
+      <thead><tr>
+        <th></th>
+        <th><%=l(:label_open_issues_plural)%></th>
+        <th><%=l(:label_closed_issues_plural)%></th>
+        <th><%=l(:label_total)%></th>
+      </tr></thead>
+      <tbody>
+      <% for row in rows %>
+          <%
+             rs = CustomValue.joins("INNER JOIN issues ON issues.id = custom_values.customized_id INNER JOIN issue_statuses ON issues.status_id=issue_statuses.id").where(
+                     :custom_values => {:custom_field_id => IssueCustomField.where(:name=>'Подкатегория').first.id})
+             if @issues.count != 0 && @query_result_issue.present?
+               rs = rs.where(@query_result_issue)
+               rs = rs.where("(#{Issue.table_name}.created_on >='#{session[:date_from].to_s + " 00:00:00"}' AND #{Issue.table_name}.created_on <='#{session[:date_to].to_s + " 23:59:00"}')") if session[:date_to].present? && session[:date_from].present?
+             else
+               rs = rs.where("issues.id=0")
+             end
+          %>
+          <% open = rs.where(:custom_values=>{:value=>row},
+                             :issue_statuses=>{:is_closed => 0}).count %>
+          <% close = rs.where(:custom_values=>{:value=>row},
+                              :issue_statuses=>{:is_closed => 1}).count %>
+          <% total = close + open
+          %>
+          <tr class="<%= cycle("odd", "even") %>">
+            <td class="name"><%= link_to row, project_issues_path(@project) %></td>
+            <td><% if open != 0 %>
+                  <%= link_to open, project_issues_path(@project) %>
+              <% else %>
+              -
+              <% end %>
+            </td>
+            <td><% if close != 0 %>
+                  <%= link_to close, project_issues_path(@project) %>
+              <% else %>
+                  -
+              <% end %></td>
+            <td><% if total != 0 %>
+                  <%= link_to total, project_issues_path(@project) %>
+              <% else %>
+                  -
+              <% end %></td>
+          </tr>
+      <% end %>
+      </tbody>
+    </table>
+<% end
+   reset_cycle %>
