@@ -12,10 +12,10 @@
       <% for row in rows %>
           <%
              rs = CustomValue.joins("INNER JOIN issues ON issues.id = custom_values.customized_id INNER JOIN issue_statuses ON issues.status_id=issue_statuses.id").where(
-                     :custom_values => {:custom_field_id => IssueCustomField.where(:name=>'Подкатегория').first.id})
+                     :custom_values => {:custom_field_id => custom_field.id })
              if @issues.count != 0 && @query_result_issue.present?
                rs = rs.where(@query_result_issue)
-               rs = rs.where("(#{Issue.table_name}.created_on >='#{session[:date_from].to_s + " 00:00:00"}' AND #{Issue.table_name}.created_on <='#{session[:date_to].to_s + " 23:59:00"}')") if session[:date_to].present? && session[:date_from].present?
+               rs = rs.where("(#{Issue.table_name}.created_on >='#{session[:date_from].to_s + " 00:00:00"}' AND #{Issue.table_name}.created_on <='#{session[:date_to].to_s + " 23:59:00"}')") if session[:cb_dates].to_s == "checked"
              else
                rs = rs.where("issues.id=0")
              end

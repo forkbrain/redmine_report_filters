@@ -65,6 +65,7 @@ Redmine::Plugin.register :redmine_report_filters do
             session[:cb_dates] = ""
             date_from = date_to = nil
           end
+          @custom_fields = @project.all_issue_custom_fields.where(:field_format => 'list')
           @issues_by_tracker = Issue.by_tracker(@project, date_from, date_to, result, @issue_count)
           @issues_by_version = Issue.by_version(@project, date_from, date_to, result, @issue_count)
           @issues_by_priority = Issue.by_priority(@project, date_from, date_to, result, @issue_count)
@@ -72,7 +73,6 @@ Redmine::Plugin.register :redmine_report_filters do
           @issues_by_assigned_to = Issue.by_assigned_to(@project, date_from, date_to, result, @issue_count)
           @issues_by_author = Issue.by_author(@project, date_from, date_to, result, @issue_count)
           @issues_by_subproject = Issue.by_subproject(@project) || []
-          @issue = Issue.new
           render :template => "reports/issue_report"
         end
         def issue_report_details
@@ -98,47 +98,54 @@ Redmine::Plugin.register :redmine_report_filters do
             date_to = session[:date_to]
             date_from = session[:date_from]
           end
-          case params[:detail]
-            when "tracker"
-              @field = "tracker_id"
-              @rows = @project.trackers
-              @data = Issue.by_tracker(@project, date_from, date_to, result, @issue_count)
-              @report_title = l(:field_tracker)
-            when "version"
-              @field = "fixed_version_id"
-              @rows = @project.shared_versions.sort
-              @data = Issue.by_version(@project, date_from, date_to, result, @issue_count)
-              @report_title = l(:field_version)
-            when "priority"
-              @field = "priority_id"
-              @rows = IssuePriority.all.reverse
-              @data = Issue.by_priority(@project, date_from, date_to, result, @issue_count)
-              @report_title = l(:field_priority)
-            when "category"
-              @field = "category_id"
-              @rows = @project.issue_categories
-              @data = Issue.by_category(@project, date_from, date_to, result, @issue_count)
-              @report_title = l(:field_category)
-            when "assigned_to"
-              @field = "assigned_to_id"
-              @rows = (Setting.issue_group_assignment? ? @project.principals : @project.users).sort
-              @data = Issue.by_assigned_to(@project, date_from, date_to, result, @issue_count)
-              @report_title = l(:field_assigned_to)
-            when "author"
-              @field = "author_id"
-              @rows = @project.users.sort
-              @data = Issue.by_author(@project, date_from, date_to, result, @issue_count)
-              @report_title = l(:field_author)
-            when "subproject"
-              @field = "project_id"
-              @rows = @project.descendants.visible
-              @data = Issue.by_subproject(@project) || []
-              @report_title = l(:field_subproject)
-            when "subcategory"
-              @field = "subcategory"
-              @rows = CustomField.where(:name => 'Подкатегория').first.possible_values
-              @report_title = 'Подкатегория'
-              @query_result_issue = result
+          if params[:detail].index('custom_field_')
+            if params[:detail].split('_')[2].to_i > 0
+              @custom_field = CustomField.where(:id=> params[:detail].split('_')[2], :field_format => 'list' ).first
+              if @custom_field.present?
+                @field = params[:detail]
+                @rows = @custom_field.possible_values
+                @report_title = @custom_field.name
+                @query_result_issue = result
+              end
+            end
+          else
+            case params[:detail]
+              when "tracker"
+                @field = "tracker_id"
+                @rows = @project.trackers
+                @data = Issue.by_tracker(@project, date_from, date_to, result, @issue_count)
+                @report_title = l(:field_tracker)
+              when "version"
+                @field = "fixed_version_id"
+                @rows = @project.shared_versions.sort
+                @data = Issue.by_version(@project, date_from, date_to, result, @issue_count)
+                @report_title = l(:field_version)
+              when "priority"
+                @field = "priority_id"
+                @rows = IssuePriority.all.reverse
+                @data = Issue.by_priority(@project, date_from, date_to, result, @issue_count)
+                @report_title = l(:field_priority)
+              when "category"
+                @field = "category_id"
+                @rows = @project.issue_categories
+                @data = Issue.by_category(@project, date_from, date_to, result, @issue_count)
+                @report_title = l(:field_category)
+              when "assigned_to"
+                @field = "assigned_to_id"
+                @rows = (Setting.issue_group_assignment? ? @project.principals : @project.users).sort
+                @data = Issue.by_assigned_to(@project, date_from, date_to, result, @issue_count)
+                @report_title = l(:field_assigned_to)
+              when "author"
+                @field = "author_id"
+                @rows = @project.users.sort
+                @data = Issue.by_author(@project, date_from, date_to, result, @issue_count)
+                @report_title = l(:field_author)
+              when "subproject"
+                @field = "project_id"
+                @rows = @project.descendants.visible
+                @data = Issue.by_subproject(@project) || []
+                @report_title = l(:field_subproject)
+            end
           end
 
           respond_to do |format|
@@ -228,7 +235,7 @@ Redmine::Plugin.register :redmine_report_filters do
           res = options.delete(:result)
           result_where = "and #{res}" if res.present?
           if count != 0 || res.present?
-              date_where = "and (#{Issue.table_name}.created_on >='#{date_from.to_s + " 00:00:00"}' AND #{Issue.table_name}.created_on <='#{date_to.to_s + " 23:59:00"}')" if date_to.present? && date_from.present?
+            date_where = "and (#{Issue.table_name}.created_on >='#{date_from.to_s + " 00:00:00"}' AND #{Issue.table_name}.created_on <='#{date_to.to_s + " 23:59:00"}')" if date_to.present? && date_from.present?
           else
             date_where = "and (#{Issue.table_name}.id=0)"
           end

@@ -36,9 +36,11 @@
   <h3><%=l(:field_category)%>&nbsp;&nbsp;<%= link_to image_tag('zoom_in.png'), project_issues_report_details_path(@project, :detail => 'category') %></h3>
   <%= render :partial => 'simple', :locals => { :data => @issues_by_category, :field_name => "category_id", :rows => @categories } %>
   <br />
-  <h3>Подкатегория&nbsp;&nbsp;<%= link_to image_tag('zoom_in.png'), project_issues_report_details_path(@project, :detail => 'subcategory') %></h3>
-  <%= render :partial => 'simple_subcat', :locals => { :data => @issues_by_subcategory, :field_name => "subcategory_id", :rows => CustomField.where(:name=>'Подкатегория').first.possible_values } %>
-  <br />
+  <% @custom_fields.each do |t| %>
+      <h3><%= t.name %>&nbsp;&nbsp;<%= link_to image_tag('zoom_in.png'), project_issues_report_details_path(@project, :detail => "custom_field_#{t.id}") %></h3>
+      <%= render :partial => 'simple_subcat', :locals => { :custom_field => t, :data => @issues_by_subcategory, :field_name => "custom_field_id", :rows => t.possible_values } %>
+      <br />
+  <% end %>
   <%= call_hook(:view_reports_issue_report_split_content_right, :project => @project) %>
 </div>
 
