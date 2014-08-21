@@ -29,7 +29,7 @@ Redmine Report Filters
 Установка и Настройка
 ===============
 
-Следуйте шагам по установке плагинов для Redmine на: www.redmine.org/wiki/redmine/Plugins
+Следуйте шагам по установке плагинов для Redmine на: www.redmine.org/wiki/redmine/plugins
 
 Перезапустите веб-сервер Redmine (например mongrel, thin, mod_rails)
 
