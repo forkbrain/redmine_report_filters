@@ -1,0 +1,14 @@
+<table>
+  <tbody>
+  <tr>
+    <th><%= t(:settings_closed_statuses) %></th>
+    <td>
+      <select id="settings_closed_statuses" name="settings[settings_closed_statuses][]" multiple="multiple" size="10">
+        <% IssueStatus.all.each do |t| %>
+            <option value="<%= t.id %>" <%= " selected" if settings['settings_closed_statuses'].present? && settings['settings_closed_statuses'].include?(t.id.to_s) %>><%= t.name %></option>
+        <% end %>
+      </select>
+    </td>
+  </tr>
+  </tbody>
+</table>

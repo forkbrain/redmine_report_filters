@@ -1,11 +1,12 @@
 # encoding: utf-8
 Redmine::Plugin.register :redmine_report_filters do
   name 'Redmine Report Filters plugin'
-  author 'Forkbrain'
+  author 'Alexandr Kholodniak'
   description 'The plugin adds the ability to filter tasks in the reports.'
   version '0.0.1'
-  url ''
-  author_url 'http://forkbrain.com/'
+  url 'http://works.kholodniak.ru/redmine/redmine_report_filters'
+  author_url 'http://kholodniak.ru/'
+
   module ReportsControllerPatch
     def self.included(base)
       base.class_eval do
@@ -65,7 +66,7 @@ Redmine::Plugin.register :redmine_report_filters do
             session[:cb_dates] = ""
             date_from = date_to = nil
           end
-          @custom_fields = @project.all_issue_custom_fields.where(:field_format => 'list')
+          @custom_fields = @project.all_issue_custom_fields.select{|x| x.field_format == 'list'}
           @issues_by_tracker = Issue.by_tracker(@project, date_from, date_to, result, @issue_count)
           @issues_by_version = Issue.by_version(@project, date_from, date_to, result, @issue_count)
           @issues_by_priority = Issue.by_priority(@project, date_from, date_to, result, @issue_count)
@@ -273,5 +274,6 @@ Redmine::Plugin.register :redmine_report_filters do
   project_module :report_filters do
     permission :view_report_filters, :reports => :issue_report
   end
-  menu :project_menu, :report, {:controller => 'reports', :action => 'issue_report'}, :caption => 'Отчет', :after => :activity
+  menu :project_menu, :report, {:controller => 'reports', :action => 'issue_report'}, :caption => :report, :after => :activity
+  settings :default => {'empty' => true}, :partial => 'settings/report_settings'
 end

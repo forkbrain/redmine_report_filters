@@ -1,0 +1,10 @@
+<script>
+    $('.issues').removeClass('selected');
+    $('.report').addClass('selected');
+    $('#created_vs_resolved_issues_report').css('font-weight', 'bold');
+    $('#created_vs_resolved_issues_report').css('color', 'black');
+</script>
+<% content_for :sidebar do %>
+    <%= render :partial => 'shared/sidebar_menu' %>
+<% end %>
+<h2><%= t(:created_vs_resolved_issues_report) %></h2>
