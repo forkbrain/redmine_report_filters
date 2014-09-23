@@ -1,0 +1,127 @@
+
+<%= stylesheet_link_tag 'style', :plugin => 'redmine_report_filters' %>
+<%= javascript_include_tag 'amcharts.js', :plugin => 'redmine_report_filters' %>
+<%= javascript_include_tag 'serial.js', :plugin => 'redmine_report_filters' %>
+<script type="text/javascript">
+
+    // since v3, chart can accept data in JSON format
+    // if your category axis parses dates, you should only
+    // set date format of your data (dataDateFormat property of AmSerialChart)
+    var chartData = [<%= @chart.html_safe %>
+    ];
+    var chart;
+
+    AmCharts.ready(function () {
+        // SERIAL CHART
+        chart = new AmCharts.AmSerialChart();
+        chart.dataProvider = chartData;
+        chart.pathToImages = "../amcharts/images/";
+        chart.categoryField = "date";
+        chart.dataDateFormat = "YYYY-MM-DD";
+
+        var balloon = chart.balloon;
+        balloon.cornerRadius = 6;
+        balloon.adjustBorderColor = false;
+        balloon.horizontalPadding = 10;
+        balloon.verticalPadding = 10;
+
+        // AXES
+        // category axis
+        var categoryAxis = chart.categoryAxis;
+        categoryAxis.labelRotation = 45; // this line makes category values to be rotated
+        categoryAxis.parseDates = false; // as our data is date-based, we set parseDates to true
+        categoryAxis.autoGridCount = false;
+        categoryAxis.gridCount = 50;
+        categoryAxis.gridAlpha = 0;
+        categoryAxis.gridColor = "#000000";
+        categoryAxis.axisColor = "#555555";
+
+        // as we have data of different units, we create two different value axes
+        // Duration value axis
+        var durationAxis = new AmCharts.ValueAxis();
+        durationAxis.gridAlpha = 0.05;
+        durationAxis.axisAlpha = 0;
+        chart.addValueAxis(durationAxis);
+
+
+        // GRAPHS
+        // duration graph
+        var createdGraph = new AmCharts.AmGraph();
+        createdGraph.title = "<%= t(:created) %>";
+        createdGraph.valueField = "created";
+        createdGraph.type = "line";
+        createdGraph.valueAxis = durationAxis; // indicate which axis should be used
+        createdGraph.lineColorField = "createdColor";
+        createdGraph.fillColorsField = "createdColor";
+        createdGraph.fillAlphas = 0.3;
+        createdGraph.balloonText = "<%= t(:created) %> : [[value]]";
+        createdGraph.lineThickness = 1;
+        createdGraph.balloonColor = "#FF3030";
+        createdGraph.legendValueText = "[[value]]";
+        createdGraph.bullet = "square";
+        createdGraph.bulletBorderThickness = 1;
+        createdGraph.bulletBorderAlpha = 1;
+        chart.addGraph(createdGraph);
+
+        var resolvedGraph = new AmCharts.AmGraph();
+        resolvedGraph.title = "<%= t(:resolved) %>";
+        resolvedGraph.valueField = "resolved";
+        resolvedGraph.type = "line";
+        resolvedGraph.valueAxis = durationAxis; // indicate which axis should be used
+        resolvedGraph.lineColorField = "resolvedColor";
+        resolvedGraph.fillColorsField = "resolvedColor";
+        resolvedGraph.fillAlphas = 0.3;
+        resolvedGraph.balloonText = "<%= t(:resolved) %> : [[value]]";
+        resolvedGraph.balloonColor = "#009900";
+        resolvedGraph.lineThickness = 1;
+        resolvedGraph.legendValueText = "[[value]]";
+        resolvedGraph.bullet = "square";
+        resolvedGraph.bulletBorderThickness = 1;
+        resolvedGraph.bulletBorderAlpha = 1;
+        chart.addGraph(resolvedGraph);
+        // CURSOR
+        var chartCursor = new AmCharts.ChartCursor();
+        chartCursor.zoomable = false;
+        chartCursor.categoryBalloonDateFormat = "YYYY MMM DD";
+        chartCursor.cursorAlpha = 0;
+        chart.addChartCursor(chartCursor);
+
+        // WRITE
+        chart.write("chartdiv");
+    });
+</script>
+
+<br>
+<br>
+<div id="chartdiv" style="width:100%; height:600px;"></div>
+<br><br>
+<% if @table_results.present? %>
+    <div class="CSSTableGenerator" >
+      <table >
+        <tr>
+          <td>
+            <%= t(:period) %>
+          </td>
+          <td >
+            <%= t(:created) %>
+          </td>
+          <td >
+            <%= t(:resolved) %>
+          </td>
+        </tr>
+        <% @table_results.each do |t| %>
+            <tr>
+              <td>
+                <%= t.period %>
+              </td>
+              <td >
+                <%= t.unresolved %>
+              </td>
+              <td >
+                <%= t.total_age %>
+              </td>
+            </tr>
+        <% end %>
+      </table>
+    </div>
+<% end %>

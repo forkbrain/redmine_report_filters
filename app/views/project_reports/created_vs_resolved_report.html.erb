@@ -1,0 +1,90 @@
+<script>
+    $('.issues').removeClass('selected');
+    $('.report').addClass('selected');
+    $('#created_vs_resolved_issues_report').css('font-weight', 'bold');
+    $('#created_vs_resolved_issues_report').css('color', 'black');
+</script>
+<% content_for :sidebar do %>
+    <%= render :partial => 'shared/sidebar_menu' %>
+<% end %>
+<h2><%= t(:created_vs_resolved_issues_report) %></h2>
+<% if @not_configure.present? %>
+    <div id="errorExplanation"><ul>
+      <li><%= t(:error_not_config) %> <a href="/settings/plugin/redmine_report_filters"><%= t(:configure) %></a></li>
+    </ul></div>
+<% end %>
+<% if @not_configure.nil? %>
+    <%= form_tag({ :controller => 'project_reports', :action => 'created_vs_resolved_report', :project_id => @project },
+                 :method => :get, :id => 'query_form') do %>
+        <div id="query_form_with_buttons" class="hide-when-print">
+          <%= hidden_field_tag 'set_filter', '1' %>
+          <div id="query_form_content">
+            <fieldset id="created_vs_resolved_issues_report_filters" class="collapsible <%= @query.new_record? ? "" : "collapsed" %>">
+              <legend onclick="toggleFieldset(this);"><%= t(:label_params_data) %></legend>
+              <div style="<%= @query.new_record? ? "" : "display: none;" %>">
+                <table style="width: 100%">
+                  <tr>
+                    <td><%= t(:period) %></td>
+                    <td>
+                      <select name="period_report" >
+                        <option value="daily" <%= "selected" if session[:period_report] == "daily" %>><%= t(:daily) %></option>
+                        <option value="weekly" <%= "selected" if session[:period_report] == "weekly" %>><%= t(:weekly) %></option>
+                        <option value="monthly" <%= "selected" if session[:period_report] == "monthly" %>><%= t(:monthly) %></option>
+                      </select>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><%= t(:days_previously) %></td>
+                    <td>
+                      <input type="text" name="days_previously" value="<%= session[:days_previously] %>" />
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </fieldset>
+            <fieldset id="filters" class="collapsible collapsed">
+              <legend onclick="toggleFieldset(this);"><%= l(:label_filter_plural) %></legend>
+              <div style="display: none;">
+                <%= render :partial => 'queries/filters', :locals => {:query => @query} %>
+              </div>
+            </fieldset>
+            <fieldset class="collapsible collapsed">
+              <legend onclick="toggleFieldset(this);"><%= l(:label_options) %></legend>
+              <div style="display: none;">
+                <table>
+                  <tr>
+                    <td><%= l(:field_column_names) %></td>
+                    <td><%= render_query_columns_selection(@query) %></td>
+                  </tr>
+                  <tr>
+                    <td><label for='group_by'><%= l(:field_group_by) %></label></td>
+                    <td><%= select_tag('group_by',
+                                       options_for_select(
+                                               [[]] + @query.groupable_columns.collect {|c| [c.caption, c.name.to_s]},
+                                               @query.group_by)
+                            ) %></td>
+                  </tr>
+                  <tr>
+                    <td><%= l(:button_show) %></td>
+                    <td><%= available_block_columns_tags(@query) %></td>
+                  </tr>
+                </table>
+              </div>
+            </fieldset>
+          </div>
+          <p class="buttons">
+            <%= link_to_function l(:button_apply), 'submit_query_form("query_form")', :class => 'icon icon-checked' %>
+            <%= link_to l(:button_clear), { :set_filter => 1, :project_id => @project }, :class => 'icon icon-reload'  %>
+            <% if @query.new_record? && User.current.allowed_to?(:save_queries, @project, :global => true) %>
+                <%= link_to_function l(:button_save),
+                                     "$('#query_form').attr('action', '#{ @project ? new_project_query_path(@project) : new_query_path }'); submit_query_form('query_form')",
+                                     :class => 'icon icon-save' %>
+            <% end %>
+          </p>
+        </div>
+    <% end %>
+
+
+        <%= render :partial => 'shared/created_vs_resolved_issues_report_diagram' %>
+
+<% end %>
