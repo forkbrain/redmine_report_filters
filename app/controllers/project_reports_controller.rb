@@ -168,6 +168,8 @@ class ProjectReportsController < ApplicationController
       @days_previously = params[:days_previously]
       @chart = ""
       @days = 0
+      @created = 0
+      @resolved = 0
       session[:period_report] = "daily"
       session[:period_report] = @period if @period.present?
       session[:days_previously] = 0
@@ -263,14 +265,16 @@ class ProjectReportsController < ApplicationController
               end
             end
           end
-          if @res.count > 0 || @closed.count > 0
-            if @period.present? && @period == "daily"
-              @chart += "{ 'date': '#{i.days.ago.strftime(date_format.to_s)}', 'resolved': '#{(@days_closed).to_s}',  'created': '#{(@days).to_s}', 'createdColor':'#{colors[0]}', 'resolvedColor':'#{colors[1]}'}"
-              @chart += "," if (@days_previously.to_i - i) < @days_previously.to_i - 1
-              week = i.days.ago.strftime("%W").to_i
-              @table_results << TableResult.new(i.days.ago.strftime(date_format.to_s), @days, @days_closed, @res.count)
-            end
+          
+          if @period.present? && @period == "daily"
+            @chart += "{ 'date': '#{i.days.ago.strftime(date_format.to_s)}', 'resolved': '#{(@days_closed + @resolved).to_s}',  'created': '#{(@days + @created).to_s}', 'createdColor':'#{colors[0]}', 'resolvedColor':'#{colors[1]}'}"
+            @chart += "," if (@days_previously.to_i - i) < @days_previously.to_i - 1
+            week = i.days.ago.strftime("%W").to_i
+            @table_results << TableResult.new(i.days.ago.strftime(date_format.to_s), @days, @days_closed, @res.count)
+            @created += @days
+            @resolved += @days_closed
           end
+
           i -= 1
         end
       end
