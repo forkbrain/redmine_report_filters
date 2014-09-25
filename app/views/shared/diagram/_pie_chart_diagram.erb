@@ -1,0 +1,60 @@
+<script type="text/javascript">
+    var chart;
+    var legend;
+
+    var chartData = [<%= @chart.html_safe %>];
+
+    AmCharts.ready(function () {
+        // PIE CHART
+        chart = new AmCharts.AmPieChart();
+        chart.dataProvider = chartData;
+        chart.titleField = "field";
+        chart.valueField = "count";
+
+        // LEGEND
+        legend = new AmCharts.AmLegend();
+        legend.position = 'right';
+        legend.markerType = "circle";
+        legend.marginRight = '80';
+        chart.balloonText = "[[title]]<br><span style='font-size:14px'><b>[[value]]</b> ([[percents]]%)</span>";
+        chart.addLegend(legend);
+
+        // WRITE
+        chart.write("chartdiv");
+    });
+
+    // changes label position (labelRadius)
+    function setLabelPosition() {
+        if (document.getElementById("rb1").checked) {
+            chart.labelRadius = 30;
+            chart.labelText = "[[title]]: [[value]]";
+        } else {
+            chart.labelRadius = -30;
+            chart.labelText = "[[percents]]%";
+        }
+        chart.validateNow();
+    }
+
+
+    // makes chart 2D/3D
+    function set3D() {
+        if (document.getElementById("rb3").checked) {
+            chart.depth3D = 10;
+            chart.angle = 10;
+        } else {
+            chart.depth3D = 0;
+            chart.angle = 0;
+        }
+        chart.validateNow();
+    }
+
+    // changes switch of the legend (x or v)
+    function setSwitch() {
+        if (document.getElementById("rb5").checked) {
+            legend.switchType = "x";
+        } else {
+            legend.switchType = "v";
+        }
+        legend.validateNow();
+    }
+</script>

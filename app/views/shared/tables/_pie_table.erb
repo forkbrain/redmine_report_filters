@@ -1,0 +1,30 @@
+<% if pie_table.present? && pie_table.count >0 %>
+    <div class="CSSTableGenerator" >
+      <table >
+        <tr>
+          <td>
+          </td>
+          <td >
+            <%= t(:issues) %>
+          </td>
+          <td >
+            %
+          </td>
+        </tr>
+        <% pie_table.each do |t| %>
+            <tr>
+              <td>
+                <%= t.avg_age %>
+              </td>
+              <td >
+                <%= aggregate_link @data, { @field => t.period.id }, aggregate_path(@project, @field, t.period, :status_id => "*") if t.period.present? %>
+                <%= t.unresolved if t.period.nil? %>
+              </td>
+              <td >
+                <%= t.total_age %>
+              </td>
+            </tr>
+        <% end %>
+      </table>
+    </div>
+<% end %>

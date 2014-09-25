@@ -1,0 +1,36 @@
+<% if average_table.present? && average_table.count >0 %>
+    <div class="CSSTableGenerator" >
+      <table >
+        <tr>
+          <td>
+            <%= t(:period) %>
+          </td>
+          <td >
+            <%= t(:issues_unresolved) %>
+          </td>
+          <td >
+            <%= t(:total_age) %>
+          </td>
+          <td >
+            <%= t(:avg_age) %>
+          </td>
+        </tr>
+        <% average_table.each do |t| %>
+            <tr>
+              <td>
+                <%= t.period %>
+              </td>
+              <td >
+                <%= t.unresolved %>
+              </td>
+              <td >
+                <%= t.total_age %>
+              </td>
+              <td >
+                <%= t.avg_age %>
+              </td>
+            </tr>
+        <% end %>
+      </table>
+    </div>
+<% end %>

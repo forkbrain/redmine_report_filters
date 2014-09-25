@@ -1,0 +1,54 @@
+<script type="text/javascript">
+    var chart;
+
+    var chartData = [
+        <%= @chart.html_safe %>
+    ];
+
+
+    AmCharts.ready(function () {
+        // SERIAL CHART
+        chart = new AmCharts.AmSerialChart();
+        chart.dataProvider = chartData;
+        chart.categoryField = "date";
+        chart.startDuration = 1;
+
+        // AXES
+        // category
+        var categoryAxis = chart.categoryAxis;
+        categoryAxis.labelRotation = 45; // this line makes category values to be rotated
+        categoryAxis.gridAlpha = 0;
+        categoryAxis.fillAlpha = 1;
+        categoryAxis.fillColor = "#FAFAFA";
+        categoryAxis.gridPosition = "start";
+
+        // value
+        var valueAxis = new AmCharts.ValueAxis();
+        valueAxis.dashLength = 5;
+        valueAxis.title = "<%= t(:days) %>";
+        valueAxis.axisAlpha = 0;
+        chart.addValueAxis(valueAxis);
+
+        // GRAPH
+        var graph = new AmCharts.AmGraph();
+        graph.valueField = "days";
+        graph.colorField = "color";
+        graph.balloonText = "<b>[[category]]: [[value]]</b>";
+        graph.type = "column";
+        graph.lineAlpha = 0;
+        graph.fillAlphas = 1;
+        chart.addGraph(graph);
+
+        // CURSOR
+        var chartCursor = new AmCharts.ChartCursor();
+        chartCursor.cursorAlpha = 0;
+        chartCursor.zoomable = false;
+        chartCursor.categoryBalloonEnabled = false;
+        chart.addChartCursor(chartCursor);
+
+        chart.creditsPosition = "top-right";
+
+        // WRITE
+        chart.write("chartdiv");
+    });
+</script>

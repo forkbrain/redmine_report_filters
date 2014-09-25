@@ -22,6 +22,7 @@ class ProjectReportsController < ApplicationController
   include IssuesHelper
   helper :timelog
   include ProjectReportsHelper
+  include ReportsHelper
 
   def average_age_report
     set_settings
@@ -230,6 +231,95 @@ class ProjectReportsController < ApplicationController
       @not_configure = 1
     else
       query_initialize
+      variables_init
+      set_variables
+      @custom_fields = CustomField.where( :field_format => 'list' )
+      result = nil
+      @issues.each_with_index do |t, i|
+        result = "(" if result.nil?
+        result += "#{Issue.table_name}.id=#{t.id}"
+        result += " OR " if i < @issues.count - 1
+        result += ")" if i == @issues.count - 1
+      end
+      if session[:cb_dates].to_s == "checked"
+        date_to = session[:date_to]
+        date_from = session[:date_from]
+      end
+      @issue_count = @query.issue_count
+      @query_result_issue = result
+      if params[:cb_dates].present? && params[:cb_dates].to_s.to_bool
+        date_from = params[:date_from]
+        date_to = params[:date_to]
+        session[:cb_dates] = "checked"
+      else
+        session[:cb_dates] = ""
+        date_from = date_to = nil
+      end
+      if params[:pie_type].present? && params[:pie_type].index('custom_field_')
+        if params[:detail].split('_')[2].to_i > 0
+          @custom_field = CustomField.where(:id=> params[:detail].split('_')[2], :field_format => 'list' ).first
+          if @custom_field.present?
+            @field = params[:detail]
+            @rows = @custom_field.possible_values
+            @report_title = @custom_field.name
+            @query_result_issue = result
+          end
+        end
+      elsif params[:pie_type].present?
+        case params[:pie_type]
+          when "tracker_id"
+            @field = "tracker_id"
+            @rows = @project.trackers
+            @data = Issue.by_tracker(@project, date_from, date_to, result, @issue_count)
+            @report_title = l(:field_tracker)
+            puts @data
+          when "fixed_version_id"
+            @field = "fixed_version_id"
+            @rows = @project.shared_versions.sort
+            @data = Issue.by_version(@project, date_from, date_to, result, @issue_count)
+            @report_title = l(:field_version)
+          when "priority_id"
+            @field = "priority_id"
+            @rows = IssuePriority.all.reverse
+            @data = Issue.by_priority(@project, date_from, date_to, result, @issue_count)
+            @report_title = l(:field_priority)
+          when "category_id"
+            @field = "category_id"
+            @rows = @project.issue_categories
+            @data = Issue.by_category(@project, date_from, date_to, result, @issue_count)
+            @report_title = l(:field_category)
+          when "assigned_to_id"
+            @field = "assigned_to_id"
+            @rows = (Setting.issue_group_assignment? ? @project.principals : @project.users).sort
+            @data = Issue.by_assigned_to(@project, date_from, date_to, result, @issue_count)
+            @report_title = l(:field_assigned_to)
+          when "author_id"
+            @field = "author_id"
+            @rows = @project.users.sort
+            @data = Issue.by_author(@project, date_from, date_to, result, @issue_count)
+            @report_title = l(:field_author)
+          when "project_id"
+            @field = "project_id"
+            @rows = @project.descendants.visible
+            @data = Issue.by_subproject(@project) || []
+            @report_title = l(:field_subproject)
+        end
+      end
+      if @rows.present?
+        count = 0
+        @rows.each_with_index do |t, i|
+          total = (aggregate @data, @field => t.id).to_i
+          count += total
+          @chart += "{ 'field': '#{t.name}', 'count': '#{total}' }"
+          @chart += "," if i < @rows.count - 1
+          @table_results << TableResult.new(t, total, "#{(total * 100) / @project.issues.count} %", t.name)
+        end
+        if count < @project.issues.count
+          total = @project.issues.count - count
+          @chart += ",{ 'field': '#{t(:not_assigned)}', 'count': '#{total}' }"
+          @table_results << TableResult.new(nil, total, "#{(total * 100) / @project.issues.count} %", t(:not_assigned))
+        end
+      end
     end
   end
 

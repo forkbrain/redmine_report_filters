@@ -28,6 +28,7 @@ Redmine::Plugin.register :redmine_report_filters do
         include SortHelper
         include IssuesHelper
         helper :timelog
+
         def issue_report
           retrieve_query
           sort_init(@query.sort_criteria.empty? ? [['id', 'desc']] : @query.sort_criteria)
@@ -82,7 +83,6 @@ Redmine::Plugin.register :redmine_report_filters do
           @query.sort_criteria = sort_criteria.to_a
           @issue_count = @query.issue_count
           @offset = 0
-          puts @issues
           @issues = @query.issues(:include => [:assigned_to, :tracker, :priority, :category, :fixed_version],
                                   :order => sort_clause,
                                   :offset => @offset,

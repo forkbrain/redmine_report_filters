@@ -1,0 +1,19 @@
+<tr>
+  <td><%= t(:pie_type) %></td>
+  <td>
+    <select name="pie_type">
+      <option value="tracker_id"><%= l(:field_tracker) %></option>
+      <option value="priority_id"><%= l(:field_priority) %></option>
+      <option value="assigned_to_id"><%= l(:field_assigned_to) %></option>
+      <option value="author_id"><%= l(:field_author) %></option>
+      <option value="fixed_version_id"><%= l(:field_version) %></option>
+      <% if @project.children.any? %>
+          <option value="project_id"><%= l(:field_subproject) %></option>
+      <% end %>
+      <option value="category_id"><%= l(:field_category) %></option>
+      <% @custom_fields.each do |t| %>
+          <option value="custom_field_id"><%= t.name %></option>
+      <% end %>
+    </select>
+  </td>
+</tr>

@@ -53,6 +53,4 @@
     </div>
 <% end %>
 
-<% if @issues.count > 0 %>
-    <%= render :partial => diagram_partial %>
-<% end %>
+<%= render :partial => 'shared/optional_diagram', :locals => { :diagram => diagram_partial, :table_data => table_data, :plugin_chart => plugin_chart } %>
