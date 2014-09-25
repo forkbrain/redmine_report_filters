@@ -6,6 +6,7 @@ ru:
   created_vs_resolved_issues_report: "Созданных и решенных задач"
   from: "от"
   to: "до"
+  pie_chart_report: "Круговая Диаграмма"
   created: "Создано"
   resolved: "Закрыто"
   total: "всего"

@@ -1,2 +1,3 @@
 get 'projects/:id/issues/average_age_report', :to => 'project_reports#average_age_report', :as => 'project_issues_average_age_report'
 get 'projects/:id/issues/created_vs_resolved_report', :to => 'project_reports#created_vs_resolved_report', :as => 'project_issues_created_vs_resolved_report'
+get 'projects/:id/issues/pie_chart_report', :to => 'project_reports#pie_chart_report', :as => 'project_issues_pie_chart_report'

@@ -7,6 +7,7 @@ en:
   created_vs_resolved_issues_report: "Created vs Resolved Issues Report"
   from: "from"
   to: "to"
+  pie_chart_report: "Pie Chart Report"
   created: "Created"
   total: "total"
   resolved: "Resolved"

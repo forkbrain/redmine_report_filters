@@ -1,0 +1,10 @@
+  <tr>
+    <td><%= t(:period) %></td>
+    <td>
+      <select name="period_report" >
+        <option value="daily" <%= "selected" if session[:period_report] == "daily" %>><%= t(:daily) %></option>
+        <option value="weekly" <%= "selected" if session[:period_report] == "weekly" %>><%= t(:weekly) %></option>
+        <option value="monthly" <%= "selected" if session[:period_report] == "monthly" %>><%= t(:monthly) %></option>
+      </select>
+    </td>
+  </tr>
