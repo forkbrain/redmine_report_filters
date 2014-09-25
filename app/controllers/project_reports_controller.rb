@@ -266,6 +266,7 @@ class ProjectReportsController < ApplicationController
           end
         end
       elsif params[:pie_type].present?
+        session[:pie_type] = params[:pie_type]
         case params[:pie_type]
           when "tracker_id"
             @field = "tracker_id"

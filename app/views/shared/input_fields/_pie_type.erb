@@ -1,7 +1,7 @@
 <tr>
   <td><%= t(:pie_type) %></td>
   <td>
-    <select name="pie_type">
+    <select name="pie_type" id="pie_type">
       <option value="tracker_id"><%= l(:field_tracker) %></option>
       <option value="priority_id"><%= l(:field_priority) %></option>
       <option value="assigned_to_id"><%= l(:field_assigned_to) %></option>
@@ -15,5 +15,6 @@
           <option value="custom_field_id"><%= t.name %></option>
       <% end %>
     </select>
+    <script>$('#pie_type option[value="<%= session[:pie_type] %>"]').prop('selected', true);</script>
   </td>
 </tr>
