@@ -318,12 +318,12 @@ class ProjectReportsController < ApplicationController
           @chart += "," if i < @rows.count - 1
           @table_results << TableResult.new(t, total, "#{(total * 100) / @all_count.count} %", t.name)
         end
-        all = @project.issues.where(@query_result_issue).where("#{@field} is NULL").count
+        all = @all_count.where("#{@field} is NULL").count
 
         if all > 0
           total = all
           @chart += ",{ 'field': '#{t(:not_assigned)}', 'count': '#{total}' }"
-          @table_results << TableResult.new(nil, total, "#{ (total * 100) / (all + count) } %", t(:not_assigned))
+          @table_results << TableResult.new(nil, total, "#{ (total * 100) / @all_count.count } %", t(:not_assigned))
         end
       end
 
