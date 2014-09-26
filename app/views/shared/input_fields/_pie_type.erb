@@ -12,7 +12,7 @@
       <% end %>
       <option value="category_id"><%= l(:field_category) %></option>
       <% @custom_fields.each do |t| %>
-          <option value="custom_field_id"><%= t.name %></option>
+          <option value="custom_field_<%= t.id %>"><%= t.name %></option>
       <% end %>
     </select>
     <script>$('#pie_type option[value="<%= session[:pie_type] %>"]').prop('selected', true);</script>

@@ -241,6 +241,8 @@ class ProjectReportsController < ApplicationController
         result += " OR " if i < @issues.count - 1
         result += ")" if i == @issues.count - 1
       end
+      session[:date_to] = params[:date_to] if params[:date_to].present?
+      session[:date_from] = params[:date_from] if params[:date_from].present?
       if session[:cb_dates].to_s == "checked"
         date_to = session[:date_to]
         date_from = session[:date_from]
@@ -256,10 +258,11 @@ class ProjectReportsController < ApplicationController
         date_from = date_to = nil
       end
       if params[:pie_type].present? && params[:pie_type].index('custom_field_')
-        if params[:detail].split('_')[2].to_i > 0
-          @custom_field = CustomField.where(:id=> params[:detail].split('_')[2], :field_format => 'list' ).first
+        if params[:pie_type].split('_')[2].to_i > 0
+          session[:pie_type] = params[:pie_type]
+          @custom_field = CustomField.where(:id=> params[:pie_type].split('_')[2], :field_format => 'list' ).first
           if @custom_field.present?
-            @field = params[:detail]
+            @field = params[:pie_type]
             @rows = @custom_field.possible_values
             @report_title = @custom_field.name
             @query_result_issue = result
@@ -272,8 +275,6 @@ class ProjectReportsController < ApplicationController
             @field = "tracker_id"
             @rows = @project.trackers
             @data = Issue.by_tracker(@project, date_from, date_to, result, @issue_count)
-            @report_title = l(:field_tracker)
-            puts @data
           when "fixed_version_id"
             @field = "fixed_version_id"
             @rows = @project.shared_versions.sort
@@ -306,7 +307,7 @@ class ProjectReportsController < ApplicationController
             @report_title = l(:field_subproject)
         end
       end
-      if @rows.present?
+      if @rows.present? && @custom_field.nil?
         count = 0
         @rows.each_with_index do |t, i|
           total = (aggregate @data, @field => t.id).to_i
@@ -315,10 +316,38 @@ class ProjectReportsController < ApplicationController
           @chart += "," if i < @rows.count - 1
           @table_results << TableResult.new(t, total, "#{(total * 100) / @project.issues.count} %", t.name)
         end
-        if count < @project.issues.count
-          total = @project.issues.count - count
+        all = @project.issues.where("#{@field} is NULL OR #{@field}=''").count
+
+        if all > 0
+          total = all
           @chart += ",{ 'field': '#{t(:not_assigned)}', 'count': '#{total}' }"
-          @table_results << TableResult.new(nil, total, "#{(total * 100) / @project.issues.count} %", t(:not_assigned))
+          @table_results << TableResult.new(nil, total, "#{ (total * 100) / (all + count) } %", t(:not_assigned))
+        end
+      end
+
+      if @rows.present? && @custom_field.present?
+        count = 0
+        @rows.each_with_index do |t, i|
+          @rs = CustomValue.joins("INNER JOIN issues ON issues.id = custom_values.customized_id INNER JOIN issue_statuses ON issues.status_id=issue_statuses.id").where(
+              :custom_values => {:custom_field_id => @custom_field.id })
+          all = @rs.count
+          if @issues.count != 0 && @query_result_issue.present?
+            @rs = @rs.where("(#{Issue.table_name}.created_on >='#{session[:date_from].to_s + " 00:00:00"}' AND #{Issue.table_name}.created_on <='#{session[:date_to].to_s + " 23:59:00"}')") if session[:cb_dates].to_s == "checked"
+            all = @rs.count
+            @rs = @rs.where(@query_result_issue)
+          else
+            @rs = @rs.where("issues.id=0")
+          end
+          total = @rs.where(:custom_values => {:value => t}).count
+          count += total
+          @chart += "{ 'field': '#{t}', 'count': '#{total}' }"
+          @chart += "," if i < @rows.count - 1
+          @table_results << TableResult.new(t, total, "#{(total * 100) / (all + count) } %", t)
+        end
+        if all > 0
+          total = all
+          @chart += ",{ 'field': '#{t(:not_assigned)}', 'count': '#{total}' }"
+          @table_results << TableResult.new(nil, total, "#{(total * 100) / (all + count) } %", t(:not_assigned))
         end
       end
     end

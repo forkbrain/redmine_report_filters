@@ -15,6 +15,21 @@
           <legend onclick="toggleFieldset(this);"><%= l(:label_filter_plural) %></legend>
           <div style="display: none;">
             <%= render :partial => 'queries/filters', :locals => {:query => @query} %>
+            <table>
+              <tr class="filter" id="tr_dates">
+                <td class="field"><input id="cb_dates" name="cb_dates" value="true" type="checkbox" onchange="$(this).val($(this).prop('checked'));" <%= session[:cb_dates] %>><label for="cb_dates"> <%= t(:report_data) %></label></td>
+                <td class="operator"><span style="float:left;"><%= t(:from) %> <input type="text" name="date_from" id="date_from" size="10" value="<%= session[:date_from] %>"></span>
+                </td>
+                <td class="operator">
+                  <span style="float:left;"><%= t(:to) %> <input type="text" name="date_to" id="date_to" size="10" value="<%= session[:date_to]%>"></span>
+                  <script>
+                      $(function() {$( "#date_from" ).datepicker(datepickerOptions);});
+                      $(function() {$( "#date_to" ).datepicker(datepickerOptions);});
+                  </script>
+
+                </td>
+              </tr>
+            </table>
           </div>
         </fieldset>
         <fieldset class="collapsible collapsed">

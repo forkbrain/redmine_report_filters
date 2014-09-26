@@ -17,8 +17,8 @@
                 <%= t.avg_age %>
               </td>
               <td >
-                <%= aggregate_link @data, { @field => t.period.id }, aggregate_path(@project, @field, t.period, :status_id => "*") if t.period.present? %>
-                <%= t.unresolved if t.period.nil? %>
+                <%= aggregate_link @data, { @field => t.period.id }, aggregate_path(@project, @field, t.period, :status_id => "*") if t.period.present? && !t.period.is_a?(String) %>
+                <%= t.unresolved if t.period.nil? || t.period.is_a?(String) %>
               </td>
               <td >
                 <%= t.total_age %>
