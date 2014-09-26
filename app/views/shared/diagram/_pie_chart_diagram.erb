@@ -13,9 +13,11 @@
 
         // LEGEND
         legend = new AmCharts.AmLegend();
-        legend.position = 'right';
+        legend.markerSize = 5;
+        legend.spacing = 5;
+        legend.valueWidth = 25;
+        legend.position = 'bottom';
         legend.markerType = "circle";
-        legend.marginRight = '80';
         chart.balloonText = "[[title]]<br><span style='font-size:14px'><b>[[value]]</b> ([[percents]]%)</span>";
         chart.addLegend(legend);
 
