@@ -308,9 +308,9 @@ class ProjectReportsController < ApplicationController
       end
       if @rows.present? && @custom_field.nil?
         count = 0
-        @all_count = Issue.where("created_on >='#{session[:date_from].to_s + " 00:00:00"}' AND created_on <='#{session[:date_to].to_s + " 23:59:00"}'") if session[:cb_dates].to_s == 'checked'
+        @all_count = @project.issues.where("created_on >='#{session[:date_from].to_s + " 00:00:00"}' AND created_on <='#{session[:date_to].to_s + " 23:59:00"}'") if session[:cb_dates].to_s == 'checked'
         @all_count = @all_count.where(@query_result_issue) if @query_result_issue.present? && @all_count.present?
-        @all_count = Issue.where(@query_result_issue) if @query_result_issue.present? && @all_count.nil?
+        @all_count = @project.issues.where(@query_result_issue) if @query_result_issue.present? && @all_count.nil?
         @rows.each_with_index do |t, i|
           total = (aggregate @data, @field => t.id).to_i
           count += total
@@ -333,12 +333,12 @@ class ProjectReportsController < ApplicationController
             :custom_values => {:custom_field_id => @custom_field.id })
         puts @rs.count
         if session[:cb_dates].to_s == "checked"
-          @all = Issue.where("created_on >='#{session[:date_from].to_s + " 00:00:00"}' AND created_on <='#{session[:date_to].to_s + " 23:59:00"}'")
+          @all = @project.issues.where("created_on >='#{session[:date_from].to_s + " 00:00:00"}' AND created_on <='#{session[:date_to].to_s + " 23:59:00"}'")
           puts "checked"
           @rs = @rs.where("(#{Issue.table_name}.created_on >='#{session[:date_from].to_s + " 00:00:00"}' AND #{Issue.table_name}.created_on <='#{session[:date_to].to_s + " 23:59:00"}')")
         end
         if @issues.count != 0 && @query_result_issue.present?
-          @all = Issue.where(@query_result_issue) if @all.nil?
+          @all = @project.issues.where(@query_result_issue) if @all.nil?
           @all = @all.where(@query_result_issue) if @all.present?
           @rs = @rs.where(@query_result_issue)
         else
