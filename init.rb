@@ -1,10 +1,10 @@
 # encoding: utf-8
 Redmine::Plugin.register :redmine_report_filters do
-  name 'Redmine Report Filters plugin'
+  name 'Redmine Reports Filters plugin'
   author 'Forkbrain ltd'
   description 'The plugin adds the ability to filter tasks in the reports.'
   version '1.2.1'
-  url 'http://forkbrain.com'
+  url 'http://redmine.forkbrain.com'
 
   module ReportsControllerPatch
     def self.included(base)
