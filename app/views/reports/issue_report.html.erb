@@ -10,6 +10,11 @@
     <%= javascript_include_tag 'jquery.ui.datepicker.validation.min.js', :plugin => 'redmine_report_filters' %>
     <%= render :partial => 'shared/filters' %>
 <% end %>
+
+<div>
+
+</div>
+
 <div class="splitcontentleft">
   <h3><%=l(:field_tracker)%>&nbsp;&nbsp;<%= link_to image_tag('zoom_in.png'), project_issues_report_details_path(@project, :detail => 'tracker') %></h3>
   <%= render :partial => 'simple', :locals => { :data => @issues_by_tracker, :field_name => "tracker_id", :rows => @trackers } %>

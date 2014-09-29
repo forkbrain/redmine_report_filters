@@ -3,7 +3,7 @@ Redmine::Plugin.register :redmine_report_filters do
   name 'Redmine Report Filters plugin'
   author 'Forkbrain ltd'
   description 'The plugin adds the ability to filter tasks in the reports.'
-  version '0.0.1'
+  version '1.2.1'
   url 'http://forkbrain.com'
 
   module ReportsControllerPatch
@@ -235,7 +235,7 @@ Redmine::Plugin.register :redmine_report_filters do
           res = options.delete(:result)
           result_where = "and #{res}" if res.present?
           if count != 0 || res.present?
-            date_where = "and (#{Issue.table_name}.created_on >='#{date_from.to_s + " 00:00:00"}' AND #{Issue.table_name}.created_on <='#{date_to.to_s + " 23:59:00"}')" if date_to.present? && date_from.present?
+            date_where = "and (#{Issue.table_name}.created_on >='#{date_from.to_s + " 00:00:00"}' AND #{Issue.table_name}.created_on <='#{date_to.to_s + " 23:59:59"}')" if date_to.present? && date_from.present?
           else
             date_where = "and (#{Issue.table_name}.id=0)"
           end
