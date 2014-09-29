@@ -4,7 +4,7 @@
 
 <% if @table_results.present? && @table_results.count > 0 %>
     <%= render :partial => diagram %>
-    <div id="chartdiv" style="width: 100%; min-height: 600px; height: <%= 17 * @chart.split(',').count if diagram_type == 'pie' %>px;"></div>
+    <div id="chartdiv" style="width: 100%; min-height: <%= diagram_type == 'pie' && 17 * @chart.split(',').count >= 600  ? 17 * @chart.split(',').count : 600 %>px;"></div>
     <br><br>
     <%= render :partial => table_data, :object => @table_results %>
 <% else %>
