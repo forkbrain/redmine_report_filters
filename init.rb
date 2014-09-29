@@ -5,7 +5,7 @@ Redmine::Plugin.register :redmine_report_filters do
   description 'The plugin adds the ability to filter tasks in the reports.'
   version '1.2.1'
   url 'http://redmine.forkbrain.com'
-  author_url: 'http://redmine.forkbrain.com'
+  author_url 'http://redmine.forkbrain.com'
 
   module ReportsControllerPatch
     def self.included(base)
