@@ -8,5 +8,5 @@
     <br><br>
     <%= render :partial => table_data, :object => @table_results %>
 <% else %>
-    <p class="nodata">Нет данных для отображения</p>
+    <p class="nodata"><%= t(:no_data) %></p>
 <% end %>
