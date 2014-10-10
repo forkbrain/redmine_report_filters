@@ -306,7 +306,7 @@ class ProjectReportsController < ApplicationController
             @report_title = l(:field_subproject)
         end
       end
-      if @rows.present? && @custom_field.nil?
+      if @rows.present? && @custom_field.nil? && @data.present?
         count = 0
         @all_count = @project.issues.where("created_on >='#{session[:date_from].to_s + " 00:00:00"}' AND created_on <='#{session[:date_to].to_s + " 23:59:00"}'") if session[:cb_dates].to_s == 'checked'
         @all_count = @all_count.where(@query_result_issue) if @query_result_issue.present? && @all_count.present?
@@ -316,14 +316,16 @@ class ProjectReportsController < ApplicationController
           count += total
           @chart += "{ 'field': '#{t.name}', 'count': '#{total}' }"
           @chart += "," if i < @rows.count - 1
-          @table_results << TableResult.new(t, total, "#{(total * 100) / @all_count.count} %", t.name)
+          total_count = @all_count.present? ? @all_count.count : 1
+          @table_results << TableResult.new(t, total, "#{(total * 100) / total_count} %", t.name)
         end
-        all = @all_count.where("#{@field} is NULL").count
+        all = @all_count.present? ? @all_count.where("#{@field} is NULL").count : 0
 
         if all > 0
           total = all
           @chart += ",{ 'field': '#{t(:not_assigned)}', 'count': '#{total}' }"
-          @table_results << TableResult.new(nil, total, "#{ (total * 100) / @all_count.count } %", t(:not_assigned))
+          total_count = @all_count.present? ? @all_count.count : 1
+          @table_results << TableResult.new(nil, total, "#{ (total * 100) / total_count } %", t(:not_assigned))
         end
       end
 
@@ -351,7 +353,6 @@ class ProjectReportsController < ApplicationController
           @chart += "," if i < @rows.count - 1
           @table_results << TableResult.new(t, total, "#{(total * 100) / @all.count } %", t)
         end
-        puts @rs.count
         if @all.count - count > 0
           total = @all.count - count
           @chart += ",{ 'field': '#{t(:not_assigned)}', 'count': '#{total}' }"
