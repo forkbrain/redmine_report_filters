@@ -1,7 +1,8 @@
 Redmine Report Filters
 ===============
 
-Feature list: https://github.com/forkbrain/redmine_reports/issues
+Feature list: https://github.com/forkbrain/redmine_reports/issues 
+
 Release plan: https://github.com/forkbrain/redmine_reports/milestones
 
 Плагин дает возможность добавлять фильтры к отчетам проекта, как по стандартным полям, так и по Настраиваемым.
