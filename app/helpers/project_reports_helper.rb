@@ -46,6 +46,7 @@ module ProjectReportsHelper
   def variables_init
     @period = params[:period_report]
     @days_previously = params[:days_previously]
+    @include_empty_projects = params[:include_empty_projects] ? true : false
     @chart = ""
     @days = 0
     @created = 0
@@ -54,6 +55,7 @@ module ProjectReportsHelper
     session[:period_report] = @period if @period.present?
     session[:days_previously] = 0
     session[:days_previously] = @days_previously if @days_previously.present?
+    session[:include_empty_projects] = @include_empty_projects
   end
 
   def set_settings

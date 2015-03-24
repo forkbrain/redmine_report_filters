@@ -12,6 +12,7 @@ ru:
   created: "Создано"
   resolved: "Закрыто"
   project: "Проект"
+  include_empty_projects: "Отображать пустые проекты"
   total: "всего"
   report_data: "Дата"
   not_assigned: "Не указано"

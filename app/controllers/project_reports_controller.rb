@@ -248,10 +248,14 @@ class ProjectReportsController < ApplicationController
           closed_issues = get_project_issues_count(p, days_ago, true)
           created_issues = get_project_issues_count(p, days_ago, false)
 
-          @table_results << TableResult.new(p.name, created_issues.to_s, closed_issues.to_s, nil)
+          unless closed_issues == 0 and created_issues == 0 and not @include_empty_projects
 
-          @chart += "{ 'project': '#{p.name}', 'created': #{created_issues}, 'closed': #{closed_issues} }"
-          @chart += ", " if idx < projects.length - 1
+            @table_results << TableResult.new(p.name, created_issues.to_s, closed_issues.to_s, nil)
+
+            @chart += "{ 'project': '#{p.name}', 'created': #{created_issues}, 'closed': #{closed_issues} }"
+            @chart += ", " if idx < projects.length - 1
+
+          end
 
         }
 
