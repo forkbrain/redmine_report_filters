@@ -225,6 +225,40 @@ class ProjectReportsController < ApplicationController
     end
   end
 
+  def all_projects_closed_vs_resolved_report
+
+    set_settings
+
+    if @plugin_settings.nil? || @plugin_settings.empty?
+      @not_configure = 1
+    else
+
+      query_initialize
+      variables_init
+
+      if @days_previously.present?
+
+        projects = Project.where("parent_id IS NULL")
+        days_ago = @days_previously.to_i.days.ago
+        @table_results = []
+        @chart = ""
+
+        projects.each_with_index { |p, idx|
+
+          closed_issues = get_project_issues_count(p, days_ago, true)
+          created_issues = get_project_issues_count(p, days_ago, false)
+
+          @table_results << TableResult.new(p.name, created_issues.to_s, closed_issues.to_s, nil)
+
+          @chart += "{ 'project': '#{p.name}', 'created': #{created_issues}, 'closed': #{closed_issues} }"
+          @chart += ", " if idx < projects.length - 1
+
+        }
+
+      end
+    end
+  end
+
   def pie_chart_report
     set_settings
     if @plugin_settings.nil? || @plugin_settings.empty?
@@ -367,4 +401,21 @@ class ProjectReportsController < ApplicationController
   def find_issue_statuses
     @statuses = IssueStatus.sorted.all
   end
+
+  def get_project_issues_count(project, days_ago, closed)
+    issues_count = 0
+
+    # Project issues count
+    issues_count += Issue.where(:project_id => project.id)
+                        .where("closed_on #{closed ? "IS NOT NULL" : "IS NULL" }")
+                        .where("created_on >= ?", days_ago).length
+
+    # Subprojects issues count
+    Project.where(:parent_id => project.id).each { |p|
+      issues_count += get_project_issues_count(p, days_ago, closed)
+    }
+
+    issues_count
+  end
+
 end

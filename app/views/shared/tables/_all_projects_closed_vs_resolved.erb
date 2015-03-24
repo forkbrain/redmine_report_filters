@@ -1,0 +1,30 @@
+<% if @table_results.present? && @table_results.count >0 %>
+    <div class="CSSTableGenerator" >
+      <table >
+        <tr>
+          <td>
+            <%= t(:project) %>
+          </td>
+          <td >
+            <%= t(:created) %>
+          </td>
+          <td >
+            <%= t(:resolved) %>
+          </td>
+        </tr>
+        <% @table_results.each do |t| %>
+            <tr>
+              <td>
+                <%= t.period %>
+              </td>
+              <td >
+                <%= t.unresolved %>
+              </td>
+              <td >
+                <%= t.total_age %>
+              </td>
+            </tr>
+        <% end %>
+      </table>
+    </div>
+<% end %>

@@ -1,0 +1,57 @@
+<script type="text/javascript">
+    var chartData = [<%= @chart.html_safe %>
+    ];
+
+    var chart = AmCharts.makeChart("chartdiv", {
+        "type": "serial",
+        "pathToImages": "http://cdn.amcharts.com/lib/3/images/",
+        "categoryField": "project",
+        "rotate": false,
+        "startDuration": 1,
+        "categoryAxis": {
+            "gridPosition": "start",
+            "position": "left"
+        },
+        "colors": [
+            "#009900",
+            "#FF3030"
+        ],
+        "trendLines": [],
+        "graphs": [
+            {
+                "balloonText": "<%= t(:created) %>:[[value]]",
+                "fillAlphas": 0.8,
+                "id": "AmGraph-1",
+                "lineAlpha": 0.2,
+                "title": "<%= t(:created) %>",
+                "type": "column",
+                "valueField": "created"
+            },
+            {
+                "balloonText": "<%= t(:resolved) %>:[[value]]",
+                "fillAlphas": 0.8,
+                "id": "AmGraph-2",
+                "lineAlpha": 0.2,
+                "title": "<%= t(:resolved) %>",
+                "type": "column",
+                "valueField": "closed"
+            }
+        ],
+        "guides": [],
+        "valueAxes": [
+            {
+                "id": "ValueAxis-1",
+                "position": "bottom",
+                "axisAlpha": 0
+            }
+        ],
+        "allLabels": [],
+        "amExport": {
+            "right": 20,
+            "top": 20
+        },
+        "balloon": {},
+        "titles": [],
+        "dataProvider": chartData
+    });
+</script>
