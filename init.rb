@@ -3,7 +3,7 @@ Redmine::Plugin.register :redmine_report_filters do
   name 'Redmine Reports Filters plugin'
   author 'Forkbrain ltd'
   description 'The plugin adds the ability to filter tasks in the reports.'
-  version '1.2.1'
+  version '1.2.4'
   url 'http://redmine.forkbrain.com'
   author_url 'http://redmine.forkbrain.com'
 
