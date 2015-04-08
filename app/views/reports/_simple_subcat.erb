@@ -21,9 +21,9 @@
              end
           %>
           <% open = rs.where(:custom_values=>{:value=>row},
-                             :issue_statuses=>{:is_closed => 0}).count %>
+                             :issue_statuses=>{:is_closed => false}).count %>
           <% close = rs.where(:custom_values=>{:value=>row},
-                              :issue_statuses=>{:is_closed => 1}).count %>
+                              :issue_statuses=>{:is_closed => true}).count %>
           <% total = close + open
           %>
           <tr class="<%= cycle("odd", "even") %>">
