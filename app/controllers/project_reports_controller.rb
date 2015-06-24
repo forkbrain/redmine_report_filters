@@ -400,6 +400,82 @@ class ProjectReportsController < ApplicationController
     end
   end
 
+  def status_time_report
+    set_settings
+
+    if @plugin_settings.nil? || @plugin_settings.empty?
+      @not_configure = 1
+    else
+
+      query_initialize
+      variables_init
+
+      unless @selected_statuses.empty? && !@days_previously.present?
+
+        date_from = @days_previously.to_i.days.ago
+        date_to = Time.zone.now
+        project_id = @project
+        now = Time.zone.now
+        # @statuses = IssueStatus.all
+
+        emps = {}
+
+        def add_info(d, u, s, t)
+          # init if not exists
+          if d[u.name].nil?
+            times = {}
+            @statuses.each { |status|
+              times[status.id] = 0
+            }
+            d[u.name] = times
+          end
+
+          d[u.name][s] += t.to_i unless d[u.name][s].nil?
+
+        end
+
+        Issue.
+            where("created_on > ? AND created_on < ?", date_from, date_to).
+            where(project_id: project_id).
+            order("created_on").each { |i|
+
+          user = i.author
+          status_changed = false
+
+          last_change = i.created_on
+          last_status_id = i.status_id
+
+          i.journals.order("created_on").each { |j|
+            j.details.where(prop_key: "status_id").each { |d|
+
+              t = j.created_on - last_change
+              s = d.old_value.to_i
+
+              add_info(emps, user, s, t)
+
+              last_change = j.created_on
+              last_status_id = d.value.to_i
+              status_changed = true
+
+            }
+          }
+
+          # if status_changed
+            add_info(emps, user, last_status_id, now - last_change)
+          # else
+          #   add_info(user, last_status_id, now - last_change)
+          # end
+
+        }
+
+        @data = emps
+
+      end
+
+    end
+
+  end
+
   private
 
   def find_issue_statuses

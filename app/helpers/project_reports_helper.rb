@@ -51,6 +51,8 @@ module ProjectReportsHelper
     @days = 0
     @created = 0
     @resolved = 0
+    @statuses = IssueStatus.where(is_closed: "false")
+    @selected_statuses = params[:statuses].present? ? IssueStatus.where(:id => params[:statuses]) : []
     session[:period_report] = "daily"
     session[:period_report] = @period if @period.present?
     session[:days_previously] = 0
@@ -76,6 +78,54 @@ module ProjectReportsHelper
     @month_days = 0
     @week_days_closed = 0
     @month_days_closed = 0
+  end
+
+  def time_in_words(t)
+    min = t(:time_min)
+    hour = t(:time_hour)
+    day = t(:time_day)
+    month = t(:time_month)
+    year = t(:time_year)
+
+    x = (t / 60.0).round
+
+    if x < 1
+      "< 1#{min}"
+    elsif x < 60
+      "#{x}#{min}"
+    else
+
+      x = (x / 60.0).round
+
+      if x < 24
+        "#{x}#{hour}"
+      else
+
+        x = (x / 24.0).round
+
+        if x < 30
+          "#{x}#{day}"
+        else
+
+          x = (x / 30.0).round
+
+          if x < 12
+            "#{x}#{month}"
+          else
+
+            m = x.modulo(12.0).round
+            y = (x / 12.0).floor
+
+            "#{y}#{year} #{m}#{month}"
+
+          end
+
+        end
+
+      end
+
+    end
+
   end
 
 end

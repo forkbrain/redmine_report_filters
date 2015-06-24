@@ -68,4 +68,12 @@
     </div>
 <% end %>
 
-<%= render :partial => 'shared/optional_diagram', :locals => { :diagram => diagram_partial, :table_data => table_data, :plugin_chart => plugin_chart, :diagram_type => diagram_type } %>
+<% if defined? custom_report_partial %>
+    <% if custom_report_data.present? %>
+        <%= render :partial => custom_report_partial, :locals => { :data => custom_report_data } %>
+    <% else %>
+        <p class="nodata"><%= t(:no_data) %></p>
+    <% end %>
+<% else %>
+    <%= render :partial => 'shared/optional_diagram', :locals => { :diagram => diagram_partial, :table_data => table_data, :plugin_chart => plugin_chart, :diagram_type => diagram_type } %>
+<% end %>

@@ -1,0 +1,27 @@
+<script>
+    <%= (link_selected 'status_time_report').html_safe %>
+</script>
+
+<% content_for :sidebar do %>
+    <%= render :partial => 'shared/sidebar_menu' %>
+<% end %>
+
+<h2><%= t(:status_time_report) %></h2>
+
+<% if @not_configure.present? %>
+    <%= render :partial => 'shared/not_configure' %>
+<% else %>
+    <%= render :partial => 'shared/filters_form',
+               :locals => {
+                       :form_controller => 'project_reports',
+                       :form_action => 'status_time_report',
+                       :input_data => 'shared/inputs/status_time',
+                       # TODO: diagram can be empty
+                       # :diagram_partial => '',
+                       # :table_data => '',
+                       # :plugin_chart => '',
+                       # :diagram_type => '',
+                       :custom_report_partial => 'shared/custom/status_time_report',
+                       :custom_report_data => @data
+               } %>
+<% end %>

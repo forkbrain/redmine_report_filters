@@ -1,0 +1,34 @@
+<%= stylesheet_link_tag 'style', :plugin => 'redmine_report_filters' %>
+<% if data.present? %>
+    <div class="CSSTableGenerator" >
+      <table >
+        <tr>
+          <td>
+            <%= t(:user_name) %>
+          </td>
+
+          <% @selected_statuses.each do |s| %>
+            <td>
+              <%= s.name %>
+            </td>
+          <% end %>
+        </tr>
+        <% data.keys.each do |user_name| %>
+            <tr>
+                <td>
+                  <%= user_name %>
+                </td>
+                <% @selected_statuses.each do |s| %>
+                    <td>
+                      <% if data[user_name][s.id] == 0 %>
+                          0
+                      <% else %>
+                        <%= time_in_words(data[user_name][s.id]) %>
+                      <% end %>
+                    </td>
+                <% end %>
+            </tr>
+        <% end %>
+      </table>
+    </div>
+<% end %>

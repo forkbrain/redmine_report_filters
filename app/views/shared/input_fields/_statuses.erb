@@ -1,0 +1,14 @@
+<select size="10" multiple name="statuses[]">
+  <% @statuses.each do |s| %>
+      <option
+          <% if s.in? @selected_statuses %>
+            selected
+          <% end %>
+
+          value="<%= s.id %>">
+
+        <%= s.name %>
+
+      </option>
+  <% end %>
+</select>
