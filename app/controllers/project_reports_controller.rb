@@ -23,6 +23,7 @@ class ProjectReportsController < ApplicationController
   helper :timelog
   include ProjectReportsHelper
   include ReportsHelper
+  include R3SupportHelper
 
   def average_age_report
     set_settings
@@ -340,7 +341,7 @@ class ProjectReportsController < ApplicationController
           when "project_id"
             @field = "project_id"
             @rows = @project.descendants.visible
-            @data = Issue.by_subproject(@project) || []
+            @data = issue_by_subproject(@project) || []
             @report_title = l(:field_subproject)
         end
       end

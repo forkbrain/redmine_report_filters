@@ -1,4 +1,7 @@
 # encoding: utf-8
+
+require_relative 'app/helpers/r3support_helper'
+
 Redmine::Plugin.register :redmine_report_filters do
   name 'Redmine Reports Filters plugin'
   author 'Forkbrain ltd'
@@ -29,6 +32,7 @@ Redmine::Plugin.register :redmine_report_filters do
         include SortHelper
         include IssuesHelper
         helper :timelog
+        include R3SupportHelper
 
         def issue_report
           retrieve_query
@@ -74,7 +78,7 @@ Redmine::Plugin.register :redmine_report_filters do
           @issues_by_category = Issue.by_category(@project, date_from, date_to, result, @issue_count)
           @issues_by_assigned_to = Issue.by_assigned_to(@project, date_from, date_to, result, @issue_count)
           @issues_by_author = Issue.by_author(@project, date_from, date_to, result, @issue_count)
-          @issues_by_subproject = Issue.by_subproject(@project) || []
+          @issues_by_subproject = issue_by_subproject(@project) || []
           render :template => "reports/issue_report"
         end
         def issue_report_details
@@ -144,7 +148,7 @@ Redmine::Plugin.register :redmine_report_filters do
               when "subproject"
                 @field = "project_id"
                 @rows = @project.descendants.visible
-                @data = Issue.by_subproject(@project) || []
+                @data = issue_by_subproject(@project) || []
                 @report_title = l(:field_subproject)
             end
           end
