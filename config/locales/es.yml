@@ -34,6 +34,7 @@ es:
   issues: "Tareas"
   no_data: "No hay datos que mostrar"
   user_name: "User"
+  accumulate_results: "Accumulate results"
 
   time_min: "min"
   time_hour: "h"
