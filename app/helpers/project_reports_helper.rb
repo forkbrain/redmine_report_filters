@@ -47,6 +47,7 @@ module ProjectReportsHelper
     @period = params[:period_report]
     @days_previously = params[:days_previously]
     @include_empty_projects = params[:include_empty_projects] ? true : false
+    @accumulate_results = params[:accumulate_results] ? true : false
     @chart = ""
     @days = 0
     @created = 0
@@ -58,6 +59,7 @@ module ProjectReportsHelper
     session[:days_previously] = 0
     session[:days_previously] = @days_previously if @days_previously.present?
     session[:include_empty_projects] = @include_empty_projects
+    session[:accumulate_results] = @accumulate_results
   end
 
   def set_settings

@@ -162,12 +162,16 @@ class ProjectReportsController < ApplicationController
                 @chart += "," if (@days_previously.to_i - i) < @days_previously.to_i - 1
                 week = i.days.ago.strftime("%W").to_i
                 @table_results << TableResult.new("#{(n + i).days.ago.strftime(@date_format.to_s)} - #{i.days.ago.strftime(@date_format.to_s)}", @weeks_days, @week_days_closed, @week_days)
-                @weeks_all_days = []
-                @weeks_all_days_closed = []
+                unless @accumulate_results
+                  @weeks_all_days = []
+                  @weeks_all_days_closed = []
+                end
               end
               n = 0
-              @week_days = 0
-              @week_days_closed = 0
+              unless @accumulate_results
+                @week_days = 0
+                @week_days_closed = 0
+              end
             end
             if i == 1 && i.days.ago.end_of_week.to_date != i.days.ago.to_date
               if @weeks_all_days.uniq.count > 0
@@ -177,12 +181,16 @@ class ProjectReportsController < ApplicationController
                 @chart += "," if (@days_previously.to_i - i) < @days_previously.to_i - 1
                 week = i.days.ago.strftime("%W").to_i
                 @table_results << TableResult.new("#{(n + i).days.ago.strftime(@date_format.to_s)} - #{i.days.ago.strftime(@date_format.to_s)}", @weeks_days, @week_days_closed, @week_days)
-                @weeks_all_days = []
-                @weeks_all_days_closed = []
+                unless @accumulate_results
+                  @weeks_all_days = []
+                  @weeks_all_days_closed = []
+                end
               end
               n = 0
-              @week_days = 0
-              @week_days_closed = 0
+              unless @accumulate_results
+                @week_days = 0
+                @week_days_closed = 0
+              end
             end
 
           end
@@ -194,8 +202,10 @@ class ProjectReportsController < ApplicationController
                 @chart += "{ 'date': '#{i.days.ago.strftime("%b %Y")}', 'resolved': '#{@month_days_closed}', 'created': '#{@month_days}', 'createdColor':'#{@colors[0]}', 'resolvedColor':'#{@colors[1]}'}"
                 @chart += "," if (@days_previously.to_i - i) < @days_previously.to_i - 1
                 @table_results << TableResult.new(i.days.ago.strftime("%b %Y"), @month_days, @month_days_closed, @month_days)
-                @month_all_days = []
-                @month_all_days_closed = []
+                unless @accumulate_results
+                  @month_all_days = []
+                  @month_all_days_closed = []
+                end
               end
             end
             if  i == 1 && i.days.ago.end_of_month.to_date != i.days.ago.to_date
@@ -205,8 +215,10 @@ class ProjectReportsController < ApplicationController
                 @chart += "{ 'date': '#{i.days.ago.strftime("%b %Y")}', 'resolved': '#{@month_days_closed}', 'created': '#{@month_days}', 'createdColor':'#{@colors[0]}', 'resolvedColor':'#{@colors[1]}'}"
                 @chart += "," if (@days_previously.to_i - i) < @days_previously.to_i - 1
                 @table_results << TableResult.new(i.days.ago.strftime("%b %Y"), @month_days, @month_days_closed, @month_days)
-                @month_all_days = []
-                @month_all_days_closed = []
+                unless @accumulate_results
+                  @month_all_days = []
+                  @month_all_days_closed = []
+                end
               end
             end
           end
@@ -216,8 +228,13 @@ class ProjectReportsController < ApplicationController
             @chart += "," if (@days_previously.to_i - i) < @days_previously.to_i - 1
             week = i.days.ago.strftime("%W").to_i
             @table_results << TableResult.new(i.days.ago.strftime(@date_format.to_s), @days, @days_closed, @res.count)
-            @created += @days
-            @resolved += @days_closed
+            if @accumulate_results
+              @created += @days
+              @resolved += @days_closed
+            else
+              @created = 0
+              @resolved = 0
+            end
           end
 
           i -= 1

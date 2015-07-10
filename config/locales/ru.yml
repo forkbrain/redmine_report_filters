@@ -37,6 +37,7 @@ ru:
   issues: "Задачи"
   no_data: "Нет данных для отображения"
   user_name: "Пользователь"
+  accumulate_results: "Аккумулировать результат"
 
   time_min: "мин"
   time_hour: "ч"
