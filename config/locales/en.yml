@@ -1,5 +1,6 @@
 # English strings go here for Rails i18n
 en:
+  project_module_report_filters: "Reports"
   permission_view_report_filters: "Report filters"
   reports: "Reports"
   report: "Report"
