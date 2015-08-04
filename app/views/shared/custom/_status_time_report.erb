@@ -12,6 +12,9 @@
               <%= s.name %>
             </td>
           <% end %>
+          <td>
+            <%= t(:average) %>
+          </td>
         </tr>
         <% data.keys.each do |user_name| %>
             <tr>
@@ -27,6 +30,9 @@
                       <% end %>
                     </td>
                 <% end %>
+                <td>
+                  <%= time_in_words(data[user_name]["avg"]) %>
+                </td>
             </tr>
         <% end %>
       </table>

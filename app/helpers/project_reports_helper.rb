@@ -52,7 +52,7 @@ module ProjectReportsHelper
     @days = 0
     @created = 0
     @resolved = 0
-    @statuses = IssueStatus.where(is_closed: "false")
+    @statuses = IssueStatus.where(is_closed: "false").order("position")
     @selected_statuses = params[:statuses].present? ? IssueStatus.where(:id => params[:statuses]) : []
     session[:period_report] = "daily"
     session[:period_report] = @period if @period.present?
@@ -83,42 +83,51 @@ module ProjectReportsHelper
   end
 
   def time_in_words(t)
-    min = t(:time_min)
-    hour = t(:time_hour)
-    day = t(:time_day)
-    month = t(:time_month)
-    year = t(:time_year)
 
-    x = (t / 60.0).round
+    if t == 0
 
-    if x < 1
-      "< 1#{min}"
-    elsif x < 60
-      "#{x}#{min}"
+      0
+
     else
 
-      x = (x / 60.0).round
+      min = t(:time_min)
+      hour = t(:time_hour)
+      day = t(:time_day)
+      month = t(:time_month)
+      year = t(:time_year)
 
-      if x < 24
-        "#{x}#{hour}"
+      x = (t / 60.0).round
+
+      if x < 1
+        "< 1#{min}"
+      elsif x < 60
+        "#{x}#{min}"
       else
 
-        x = (x / 24.0).round
+        x = (x / 60.0).round
 
-        if x < 30
-          "#{x}#{day}"
+        if x < 24
+          "#{x}#{hour}"
         else
 
-          x = (x / 30.0).round
+          x = (x / 24.0).round
 
-          if x < 12
-            "#{x}#{month}"
+          if x < 30
+            "#{x}#{day}"
           else
 
-            m = x.modulo(12.0).round
-            y = (x / 12.0).floor
+            x = (x / 30.0).round
 
-            "#{y}#{year} #{m}#{month}"
+            if x < 12
+              "#{x}#{month}"
+            else
+
+              m = x.modulo(12.0).round
+              y = (x / 12.0).floor
+
+              "#{y}#{year} #{m}#{month}"
+
+            end
 
           end
 

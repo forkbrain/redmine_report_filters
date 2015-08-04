@@ -38,6 +38,7 @@ ru:
   no_data: "Нет данных для отображения"
   user_name: "Пользователь"
   accumulate_results: "Аккумулировать результат"
+  average: "Среднее"
 
   time_min: "мин"
   time_hour: "ч"

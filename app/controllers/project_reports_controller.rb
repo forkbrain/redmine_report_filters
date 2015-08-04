@@ -418,7 +418,7 @@ class ProjectReportsController < ApplicationController
     end
   end
 
-  def status_time_report
+  def status_time_emp_report
     set_settings
 
     if @plugin_settings.nil? || @plugin_settings.empty?
@@ -494,7 +494,7 @@ class ProjectReportsController < ApplicationController
 
   end
 
-  def status_time_emp_report
+  def status_time_report
     set_settings
 
     if @plugin_settings.nil? || @plugin_settings.empty?
@@ -510,22 +510,22 @@ class ProjectReportsController < ApplicationController
         date_to = Time.zone.now
         project_id = @project
         now = Time.zone.now
+        emps = {}
         # @statuses = IssueStatus.all
 
-        emps = {}
+        def add_somewhere(d, a, s, t)
+          if a > 0
+            if d[a].nil?
+              times = {}
+              @statuses.each { |status|
+                times[status.id] = 0
+              }
+              d[a] = times
+            end
 
-        def add_info(d, u, s, t)
-          # init if not exists
-          if d[u.name].nil?
-            times = {}
-            @statuses.each { |status|
-              times[status.id] = 0
-            }
-            d[u.name] = times
+            d[a][s] += t.to_i unless d[a][s].nil?
+
           end
-
-          d[u.name][s] += t.to_i unless d[u.name][s].nil?
-
         end
 
         Issue.
@@ -533,40 +533,95 @@ class ProjectReportsController < ApplicationController
             where(project_id: project_id).
             order("created_on").each { |i|
 
-          j_start_id, user = find_first_assigned_to(i)
+          # last_assigned = i.assigned_to_id
+          last_assigned = i.assigned_to_id.nil? ? 0 : i.assigned_to_id
+          last_status = i.status_id
+          last_date = now
 
-          last_change = i.created_on
-          last_status_id = i.status_id
+          # if last_assigned
+          if true
+            # issue have assigned
 
-          i.journals.order("created_on").where("id >= ?", j_start_id).each { |j|
+            i.journals.order("created_on DESC").each { |j|
 
-            assigned_detail = j.details.find_by(prop_key: "assigned_to_id")
+              details = j.details.where(prop_key: ["status_id", "assigned_to_id"])
 
-            if assigned_detail.nil?
+              if details.length > 0
 
-            else
-              add_info(emps, user)
-            end
+                if details.length == 2
+                  # changed assigned and status at one time
 
+                  add_somewhere(emps, last_assigned, last_status, last_date - j.created_on)
 
-            j.details.where(prop_key: "status_id").each { |d|
+                  details.each { |d|
+                    last_status = d.old_value.to_i if d.prop_key.equal? "status_id"
+                    last_assigned = (d.old_value.nil? ? 0 : d.old_value.to_i) if d.prop_key.equal? "assigned_to_id"
+                  }
 
-              t = j.created_on - last_change
-              s = d.old_value.to_i
+                else
+                  # changed assigned or status
 
-              add_info(emps, user, s, t)
+                  detail = details[0]
 
-              last_change = j.created_on
-              last_status_id = d.value.to_i
+                  if detail.prop_key.equal? "status_id"
+                    # status
+
+                    add_somewhere(emps, last_assigned, last_status, last_date - j.created_on)
+
+                    last_status = detail.old_value.to_i
+
+                  else
+                    # assigned
+
+                    add_somewhere(emps, last_assigned, last_status, last_date - j.created_on)
+
+                    last_assigned = detail.old_value.nil? ? 0 : detail.old_value.to_i
+
+                  end
+
+                end
+
+                last_date = j.created_on
+
+              end
 
             }
-          }
 
-          add_info(emps, user, last_status_id, now - last_change)
+            add_somewhere(emps, last_assigned, last_status, i.created_on - last_date)
+
+          end
 
         }
 
-        @data = emps
+        # change ids to names
+        data = {}
+        emps.keys.each { |user_id|
+
+          users = User.where(id: user_id)
+
+          if users.length > 0
+
+            user_name = users[0].name
+
+            keys_count = emps[user_id].keys.length
+            avg = 0.0
+
+            emps[user_id].keys.each { |status_id|
+              # status_name = IssueStatus.find(status_id).name
+
+              data[user_name] = {} if data[user_name].nil?
+              data[user_name][status_id] = emps[user_id][status_id]
+              avg += emps[user_id][status_id]
+
+            }
+
+            data[user_name]["avg"] = (avg / keys_count).floor
+
+          end
+
+        }
+
+        @data = data
 
       end
 

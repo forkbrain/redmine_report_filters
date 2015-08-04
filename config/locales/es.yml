@@ -35,6 +35,7 @@ es:
   no_data: "No hay datos que mostrar"
   user_name: "User"
   accumulate_results: "Accumulate results"
+  average: "Average"
 
   time_min: "min"
   time_hour: "h"
